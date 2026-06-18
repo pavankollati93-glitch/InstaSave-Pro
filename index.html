@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>InstaSave Pro - Instagram Reel Downloader</title>
+
+<link rel="stylesheet" href="style.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+🚀 InstaSave Pro
+</div>
+
+<nav>
+<a href="#">Home</a>
+<a href="#features">Features</a>
+<a href="#faq">FAQ</a>
+<a href="#contact">Contact</a>
+</nav>
+
+</header>
+
+<section class="hero">
+
+<h1>Instagram Reel Downloader</h1>
+
+<p>
+Download Instagram Reels, Videos, Photos and Carousel Posts
+in HD Quality. Fast, Secure and Free.
+</p>
+
+<h2 class="typing-text">
+Download Reels Instantly ⚡
+</h2>
+
+</section>
+
+<section class="download-section">
+
+<div class="download-container">
+
+<input
+type="text"
+id="url"
+placeholder="Paste Instagram Link Here">
+
+<button id="pasteBtn">
+📋 Paste
+</button>
+
+<button onclick="fetchInstagram()">
+⬇ Download
+</button>
+
+</div>
+
+<div id="result"></div>
+
+</section>
+
+<section class="stats">
+
+<div class="stat">
+<h3>1M+</h3>
+<p>Downloads</p>
+</div>
+
+<div class="stat">
+<h3>500K+</h3>
+<p>Users</p>
+</div>
+
+<div class="stat">
+<h3>99%</h3>
+<p>Success Rate</p>
+</div>
+
+</section>
+
+<section id="features" class="features">
+
+<div class="feature">
+⚡ Fast Download
+</div>
+
+<div class="feature">
+🎥 HD Quality
+</div>
+
+<div class="feature">
+🔒 Secure
+</div>
+
+<div class="feature">
+📱 Mobile Friendly
+</div>
+
+</section>
+
+<section class="how-it-works">
+
+<h2>How It Works</h2>
+
+<div class="steps-grid">
+
+<div class="step-card">
+
+<img src="https://picsum.photos/400/250?1">
+
+<h3>Copy Link</h3>
+
+<p>
+Copy your Instagram Reel or Post URL.
+</p>
+
+</div>
+
+<div class="step-card">
+
+<img src="https://picsum.photos/400/250?2">
+
+<h3>Paste Link</h3>
+
+<p>
+Paste the copied URL into the box.
+</p>
+
+</div>
+
+<div class="step-card">
+
+<img src="https://picsum.photos/400/250?3">
+
+<h3>Download</h3>
+
+<p>
+Click Download and save instantly.
+</p>
+
+</div>
+
+</div>
+
+
+</section>
+
+<section id="faq" class="faq">
+
+<h2>Frequently Asked Questions</h2>
+
+<div class="faq-box">
+<h3>Is it free?</h3>
+<p>Yes, completely free forever.</p>
+</div>
+
+<div class="faq-box">
+<h3>Need Login?</h3>
+<p>No login required.</p>
+</div>
+
+<div class="faq-box">
+<h3>Can I download reels?</h3>
+<p>Yes, reels, photos and videos.</p>
+</div>
+
+</section>
+
+<footer id="contact">
+
+<h3>InstaSave Pro</h3>
+
+<p>
+Download Instagram Reels and Videos in HD Quality.
+</p>
+
+<div class="footer-links">
+
+<a href="#">Privacy Policy</a>
+<a href="#">Terms</a>
+<a href="#">Contact</a>
+
+</div>
+
+<p>
+© 2026 InstaSave Pro. All Rights Reserved.
+</p>
+
+</footer>
+<script>
+
+document.getElementById("pasteBtn")
+.addEventListener("click", async () => {
+
+    try{
+        const text =
+        await navigator.clipboard.readText();
+
+        document.getElementById("url").value =
+        text;
+    }
+    catch{
+        alert("Clipboard access denied");
+    }
+
+});
+
+function fetchInstagram(){
+
+    let url =
+    document.getElementById("url").value;
+
+    let result =
+    document.getElementById("result");
+
+
+result.innerHTML = `
+<div class="loading-dots">
+    <span>.</span>
+    <span>.</span>
+    <span>.</span>
+    <span>.</span>
+</div>
+`;
+
+
+    let form = new FormData();
+    form.append("url", url);
+
+    fetch(
+        "http://127.0.0.1:8000/fetch/instagram",
+        {
+            method:"POST",
+            body:form
+        }
+    )
+
+    .then(res => res.json())
+
+    .then(data => {
+
+        result.innerHTML = "";
+
+        if(data.error){
+
+            result.innerHTML =
+            `<p>${data.error}</p>`;
+
+            return;
+        }
+
+        
+data.media.forEach((m,i)=>{
+
+    if(m.type==="image"){
+
+        result.innerHTML += `
+        <div class="media-card">
+
+            <img
+            src="http://127.0.0.1:8000/stream?url=${encodeURIComponent(m.url)}">
+
+            <a
+            class="download-btn"
+            href="http://127.0.0.1:8000/download/instagram?url=${encodeURIComponent(m.url)}">
+
+            Download
+
+            </a>
+
+        </div>
+        `;
+
+    }else{
+
+        result.innerHTML += `
+        <div class="media-card">
+
+            <video
+            controls
+            src="http://127.0.0.1:8000/stream?url=${encodeURIComponent(m.url)}">
+            </video>
+
+            <a
+            class="download-btn1"
+            href="http://127.0.0.1:8000/download/instagram?url=${encodeURIComponent(m.url)}">
+
+            Download
+
+            </a>
+
+        </div>
+        `;
+
+    }
+
+});
+
+
+
+    })
+
+    .catch(error => {
+
+        console.log(error);
+
+        result.innerHTML =
+        "<p style='color:red'>Backend Not Running</p>";
+
+    });
+
+}
+
+
+</script>
+
+</body>
+</html>
